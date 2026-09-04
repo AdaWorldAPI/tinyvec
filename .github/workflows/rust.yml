@@ -11,7 +11,7 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         rust:
-        - 1.60.0 # approximate MSRV is Stable -30
+        - 1.97.1 # the AdaWorldAPI workspace pin (rust-toolchain.toml)
         - stable
         - beta
         - nightly
@@ -26,17 +26,16 @@ jobs:
     - uses: dtolnay/rust-toolchain@master
       with:
         toolchain: ${{ matrix.rust }}
-    # On MSRV some dev-dependencies don't build so we can't run tests.
-    - name: Check MSRV
-      if: matrix.rust == '1.60.0'
-      run: |
-        cargo check --features=alloc,std,grab_spare_slice
+    # The old check-only carve-out belonged to the 1.60.0 MSRV, where some
+    # dev-dependencies did not build. 1.97.1 is the pin every consumer of this
+    # fork builds on, so it runs the full test suite like any other channel --
+    # a version that is only ever `cargo check`ed is not a version anyone has
+    # evidence about.
     - name: Check no_std with alloc
-      if: matrix.rust != '1.60.0'
       run: |
         cargo check --tests --no-default-features --features=alloc,grab_spare_slice,latest_stable_rust
     - name: Test non nightly
-      if: matrix.rust != '1.60.0' && matrix.rust != 'nightly'
+      if: matrix.rust != 'nightly'
       run: |
         cargo test --features=alloc,std,grab_spare_slice,latest_stable_rust
     - name: Test on Nightly with All Features

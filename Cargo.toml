@@ -4,6 +4,9 @@ description = "`tinyvec` provides 100% safe vec-like data structures."
 version = "1.13.2"
 authors = ["Lokathor <zefria@gmail.com>"]
 edition = "2018"
+# The AdaWorldAPI workspace pin (see rust-toolchain.toml). Upstream carried no
+# rust-version at all; this fork states the channel its consumers build on.
+rust-version = "1.97.1"
 license = "Zlib OR Apache-2.0 OR MIT"
 keywords = ["vec", "no_std", "no-std"]
 categories = ["data-structures", "no-std"]
