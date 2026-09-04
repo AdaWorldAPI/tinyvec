@@ -21,6 +21,16 @@ jobs:
 
     runs-on: ${{ matrix.os }}
 
+    # rust-toolchain.toml pins 1.97.1 for local work and for anyone building
+    # this fork directly. rustup honors that FILE over the toolchain
+    # dtolnay/rust-toolchain installs, so without this the whole matrix
+    # silently collapses to 1.97.1 -- and the nightly job's --all-features
+    # then dies with E0554 (`#![feature]` may not be used on the stable
+    # release channel). RUSTUP_TOOLCHAIN outranks the file, so the matrix
+    # stays authoritative here while the pin still governs everywhere else.
+    env:
+      RUSTUP_TOOLCHAIN: ${{ matrix.rust }}
+
     steps:
     - uses: actions/checkout@v3
     - uses: dtolnay/rust-toolchain@master
