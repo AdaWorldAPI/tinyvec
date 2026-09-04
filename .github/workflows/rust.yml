@@ -9,15 +9,7 @@ jobs:
   build_test:
     strategy:
       matrix:
-        os: [ubuntu-latest]
-        rust:
-        - 1.60.0 # approximate MSRV is Stable -30
-        - stable
-        - beta
-        - nightly
-        include:
-          - rust: nightly
-            os: windows-latest
+        os: [ubuntu-latest, windows-latest]
 
     runs-on: ${{ matrix.os }}
 
@@ -25,29 +17,14 @@ jobs:
     - uses: actions/checkout@v3
     - uses: dtolnay/rust-toolchain@master
       with:
-        toolchain: ${{ matrix.rust }}
-    # On MSRV some dev-dependencies don't build so we can't run tests.
-    - name: Check MSRV
-      if: matrix.rust == '1.60.0'
-      run: |
-        cargo check --features=alloc,std,grab_spare_slice
+        # Must match rust-toolchain.toml, which is the source of truth for
+        # everyone building this fork. This line only tells the action which
+        # toolchain to preinstall; rustup would otherwise fetch it on the
+        # first cargo call anyway, reading the same file.
+        toolchain: 1.97.1
     - name: Check no_std with alloc
-      if: matrix.rust != '1.60.0'
       run: |
         cargo check --tests --no-default-features --features=alloc,grab_spare_slice,latest_stable_rust
-    - name: Test non nightly
-      if: matrix.rust != '1.60.0' && matrix.rust != 'nightly'
+    - name: Test
       run: |
         cargo test --features=alloc,std,grab_spare_slice,latest_stable_rust
-    - name: Test on Nightly with All Features
-      if: matrix.rust == 'nightly'
-      run: |
-        cargo test --all-features
-    # The #[debugger_visualizer] attribute is currently gated behind an unstable feature flag.
-    # In order to test the visualizers for the tinyvec crate, they have to be tested on a nightly build.
-    - name: Test debugger_visualizer feature on Nightly
-      if: |
-        matrix.os == 'windows-latest' &&
-        matrix.rust == 'nightly'
-      run: |
-        cargo test --all-features --test debugger_visualizer -- --test-threads=1

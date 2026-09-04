@@ -1,0 +1,10 @@
+# Pinned to 1.97.1 — workspace-wide toolchain parity with the AdaWorldAPI
+# siblings (lance-graph, ndarray, MedCare-rs, tesseract-rs all pin the same
+# channel). Parity is the point: this fork is consumed as a path/git dep by
+# those workspaces, so a divergent channel here reintroduces exactly the
+# cross-repo clippy/resolution divergence the shared pin exists to prevent.
+#
+# Bump explicitly when the siblings bump; never auto-track stable.
+[toolchain]
+channel = "1.97.1"
+components = ["rustfmt", "clippy"]
